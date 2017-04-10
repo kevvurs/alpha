@@ -7,10 +7,11 @@ type City struct{
 	Country 	string	`json:"country"`
 	Description 	string	`json:"description"`
 	Score		int	`json:"score"`
+	Timezone string `json:"timezone"`
 	Pop		int64	`json:"pop"`
 }
 
 func (c City) String() string {
-	return fmt.Sprintf("{name:%s, county:%s, description:%s, score:%d, pop:%d)",
-		c.Name, c.Country, c.Description, c.Score, c.Pop)
+	return fmt.Sprintf("{name:%s, county:%s, description:%s, score:%d, timezone:%s pop:%d)",
+		c.Name, c.Country, c.Description, c.Score, c.Timezone, c.Pop)
 }

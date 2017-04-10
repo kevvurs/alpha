@@ -16,7 +16,7 @@ func init() {
 
 // Query constants
 const (
-	use_database string = "USE cc_locals"
+	use_database  = "USE cc_locals"
 	select_places = "SELECT * FROM places"
 )
 func sysVar(k string) string {
