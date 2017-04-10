@@ -3,14 +3,15 @@ package data
 import (
 	"os"
 	"log"
+	"fmt"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
 // SQL Configuration
-var connectionName, user, password string
+var sqlConf cloudsql
 func init() {
-	connectionName = sysVar("CLOUDSQL_CONNECTION_NAME")
-	user = sysVar("CLOUDSQL_USER")
-	password = sysVar("CLOUDSQL_PASSWORD")
+	sqlConf.getConf()
 }
 
 // Query constants
@@ -24,4 +25,27 @@ func sysVar(k string) string {
 		log.Panicf("%s environment variable not set.", k)
 	}
 	return v
+}
+
+type cloudsql struct {
+	Connection	string	`yaml:"instance"`
+	UserName	string 	`yaml:"user"`
+	Password	string	`yaml:"paswd"`
+}
+
+func (cl cloudsql) String() string {
+	return fmt.Sprintf("Google Cloud SQL Config:\n  conn:%s, user:%s, pass:%s",
+		cl.Connection, cl.UserName, cl.Password)
+}
+
+func (c *cloudsql) getConf() *cloudsql {
+	yamlFile, err := ioutil.ReadFile("./../config.yaml")
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+	return c
 }

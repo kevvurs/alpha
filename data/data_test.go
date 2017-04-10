@@ -2,7 +2,6 @@ package data
 
 import "testing"
 
-
 func TestFetchCity(t *testing.T) {
 	city, err := FetchCity()
 	if err == nil {

@@ -12,10 +12,10 @@ func FetchCity() ([]City, error){
 	var cityList []City
 
 	// Connect to Google Cloud SQL
-	log.Printf("Connecting to %s ", connectionName)
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@cloudsql(%s)/", user, password, connectionName))
+	log.Printf("Connecting to %s ", sqlConf.Connection)
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@cloudsql(%s)/", sqlConf.UserName, sqlConf.Password, sqlConf.Connection))
 	if err != nil {
-		log.Panicf("Could not open db: %v", err)
+		log.Panicf("Could not open db: error:%v", err)
 		return cityList, err
 	}
 	defer db.Close()
