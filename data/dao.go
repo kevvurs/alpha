@@ -7,9 +7,7 @@ import (
 )
 
 // Get all cities in db
-func FetchCity() ([]City, error){
-	// return vals
-	var cityList []City
+func fetchCity(cityList *[]City) error{
 	var err error
 
 	// SQL pointers
@@ -23,28 +21,28 @@ func FetchCity() ([]City, error){
 	log.Println("Connected")
 	if err != nil {
 		log.Panicf("Could not open db: error:%v", err)
-		return cityList, err
+		return err
 	}
 	defer db.Close()
 
 	tx, err = db.Begin()
 	if err != nil {
-		log.Panicf("Could not open transaction stream: error:%v", err)
-		return cityList, err
+		log.Println("Could not open transaction stream")
+		return err
 	}
 
 	// Initialize local variables and namespace
 	rows, err = tx.Query(use_database)
 	if err != nil {
-		log.Panicf("Could not query db\n  query:%s\n  error:%v", use_database, err)
-		return cityList, err
+		log.Printf("Query failed: %s\n", use_database)
+		return err
 	}
 	defer rows.Close()
 
 	rows, err = tx.Query(select_places)
 	if err != nil {
-		log.Panicf("Could not query db\n  query:%s\n  error:%v", select_places, err)
-		return cityList, err
+		log.Printf("Query failed: %s\n", select_places)
+		return err
 	}
 
 	// Marshalling to structure
@@ -54,7 +52,7 @@ func FetchCity() ([]City, error){
 		var pop int64
 		if err := rows.Scan(&name, &country, &description, &score, &timezone, &pop); err != nil {
 			log.Panicf("Could not scan result: %v", err)
-			return cityList, err
+			return err
 		}
 
 		// Collect additional rows
@@ -66,11 +64,10 @@ func FetchCity() ([]City, error){
 			Timezone: timezone,
 			Pop: pop,
 		}
-		cityList = append(cityList, city)
+		*cityList = append(*cityList, city)
 	}
-	return cityList, nil
+	return nil
 }
-
 
 /* Appenngine heap pile
 	"fmt"
