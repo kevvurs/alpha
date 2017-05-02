@@ -1,17 +1,20 @@
 package data
 
-import "fmt"
+import 	"fmt"
 
-type City struct{
-	Name 		string	`json:"name"`
-	Country 	string	`json:"country"`
-	Description 	string	`json:"description"`
-	Score		int	`json:"score"`
-	Timezone string `json:"timezone"`
-	Pop		int64	`json:"pop"`
+type Publication struct {
+	Publisher string  `json:"publisher"`
+	Home      string  `json:"home"`
+	Imgref    string  `json:"imgRef"`
+	Hits      int     `json:"hits"`
+	Quality   float32 `json:"quality"`
+	Ycred     int     `json:"ycred"`
+	Ncred     int     `json:"ncred"`
+	Owner     string  `json:"owner"`
+	PubId     int     `json:"pubId"`
 }
 
-func (c City) String() string {
-	return fmt.Sprintf("{name:%s, county:%s, description:%s, score:%d, timezone:%s pop:%d)",
-		c.Name, c.Country, c.Description, c.Score, c.Timezone, c.Pop)
+func (p Publication) String() string {
+	return fmt.Sprintf("{publisher:%s, home:%s, imgRef:%s, hits:%d, quality:%.2f, ycred:%d, ncred:%d, owner:%s, pubId:%d}",
+		p.Publisher, p.Home, p.Imgref, p.Hits, p.Quality, p.Ycred, p.Ncred, p.Owner, p.PubId)
 }

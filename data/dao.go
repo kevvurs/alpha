@@ -1,20 +1,20 @@
 package data
 
 import (
-	"log"
 	"database/sql"
 	proxy "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/mysql"
+	"log"
 )
 
 // Get all cities in db
-func fetchCity(cityList *[]City) error{
+func fetchCity(cityList *[]Publication) error {
 	var err error
 
 	// SQL pointers
-	var 	db 		*sql.DB
-	var 	tx 		*sql.Tx
-	var 	rows 	*sql.Rows
-
+	var db *sql.DB
+	var tx *sql.Tx
+	var rows *sql.Rows
+	//proxy.Init
 	// Connect to Google Cloud SQL
 	log.Printf("Connecting to %s ", sqlConf.Connection)
 	db, err = proxy.DialPassword(sqlConf.Connection, sqlConf.UserName, sqlConf.Password)
@@ -35,6 +35,7 @@ func fetchCity(cityList *[]City) error{
 	rows, err = tx.Query(use_database)
 	if err != nil {
 		log.Printf("Query failed: %s\n", use_database)
+		tx.Rollback()
 		return err
 	}
 	defer rows.Close()
@@ -42,35 +43,42 @@ func fetchCity(cityList *[]City) error{
 	rows, err = tx.Query(select_places)
 	if err != nil {
 		log.Printf("Query failed: %s\n", select_places)
+		tx.Rollback()
 		return err
 	}
 
 	// Marshalling to structure
 	for rows.Next() {
-		var name, country, description, timezone string
-		var score int
-		var pop int64
-		if err := rows.Scan(&name, &country, &description, &score, &timezone, &pop); err != nil {
-			log.Panicf("Could not scan result: %v", err)
+		var publisher, home, imgref, owner string
+		var hits, ycred, ncred, pubId int
+		var quality float32
+		if err := rows.Scan(&publisher, &home, &imgref, &hits, &quality, &ycred, &ncred, &owner, &pubId); err != nil {
+			log.Panicf("Error: cannot read from resultset: %v", err)
+			tx.Rollback()
 			return err
 		}
 
 		// Collect additional rows
-		city := City{
-			Name: name,
-			Country: country,
-			Description: description,
-			Score: score,
-			Timezone: timezone,
-			Pop: pop,
+		city := Publication{
+			Publisher: publisher,
+			Home:      home,
+			Imgref:    imgref,
+			Hits:      hits,
+			Quality:   quality,
+			Ycred:     ycred,
+			Ncred:     ncred,
+			Owner:     owner,
+			PubId:     pubId,
 		}
 		*cityList = append(*cityList, city)
 	}
+
+	// Closeout transaction
+	err = tx.Commit()
+	if err != nil {
+		log.Printf("Warning: SQL transaction not properly commited: %v", err)
+		return err
+	}
+
 	return nil
 }
-
-/* Appenngine heap pile
-	"fmt"
-	 _ "github.com/go-sql-driver/mysql"
-	 db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@cloudsql(%s)/", sqlConf.UserName, sqlConf.Password, sqlConf.Connection))
-*/

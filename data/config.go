@@ -16,8 +16,8 @@ func init() {
 
 // Query constants
 const (
-	use_database  = "USE cc_locals"
-	select_places = "SELECT * FROM places"
+	use_database  = "USE MediaCred"
+	select_places = "SELECT * FROM Publications"
 )
 func sysVar(k string) string {
 	v := os.Getenv(k)
