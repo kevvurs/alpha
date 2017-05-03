@@ -4,9 +4,9 @@ import "testing"
 
 func TestFetchCity(t *testing.T) {
 	err := RefreshCity()
-	city := GetCityRepo()
+	publications := GetCityRepo()
 	if err == nil {
-		for _, c := range *city {
+		for _, c := range *publications.cache {
 			t.Logf("Found: %s", c)
 		}
 	} else {

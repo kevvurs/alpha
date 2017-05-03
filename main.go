@@ -1,10 +1,9 @@
 package main
 
-
 import (
-	"os"
-	"log"
 	service "github.com/kevvurs/alpha/service"
+	"log"
+	"os"
 )
 
 func main() {

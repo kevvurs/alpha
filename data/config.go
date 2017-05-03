@@ -1,17 +1,19 @@
 package data
 
 import (
-	"os"
-	"log"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
+	"os"
 )
 
 // SQL Configuration
 var sqlConf cloudsql
+
 func init() {
 	sqlConf.getConf()
+	pubCache.cache = make(map[int]string)
 }
 
 // Query constants
@@ -19,6 +21,7 @@ const (
 	use_database  = "USE MediaCred"
 	select_places = "SELECT * FROM Publications"
 )
+
 func sysVar(k string) string {
 	v := os.Getenv(k)
 	if v == "" {
@@ -28,9 +31,9 @@ func sysVar(k string) string {
 }
 
 type cloudsql struct {
-	Connection	string	`yaml:"instance"`
-	UserName	string 	`yaml:"user"`
-	Password	string	`yaml:"paswd"`
+	Connection string `yaml:"instance"`
+	UserName   string `yaml:"user"`
+	Password   string `yaml:"paswd"`
 }
 
 func (cl cloudsql) String() string {

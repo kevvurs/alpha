@@ -37,4 +37,3 @@ func initRoutes(mx *mux.Router, formatter *render.Render) {
 	// mx.HandleFunc("/matches/{id}", getMatchDetailsHandler(formatter, repo)).Methods("GET")
 	// mx.HandleFunc("/matches/{id}/moves", addMoveHandler(formatter, repo)).Methods("POST")
 }
-

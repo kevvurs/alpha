@@ -7,23 +7,24 @@ import (
 )
 
 // Get all cities in db
-func fetchCity(cityList *[]Publication) error {
-	var err error
+func fetchCity(pubs *PubCache) error {
+	pubs.mux.Lock()
+	defer pubs.mux.Unlock()
 
 	// SQL pointers
 	var db *sql.DB
 	var tx *sql.Tx
 	var rows *sql.Rows
-	//proxy.Init
+	var err error
+
 	// Connect to Google Cloud SQL
 	log.Printf("Connecting to %s ", sqlConf.Connection)
-	db, err = proxy.DialPassword(sqlConf.Connection, sqlConf.UserName, sqlConf.Password)
-	log.Println("Connected")
-	if err != nil {
+	if db, err = proxy.DialPassword(sqlConf.Connection, sqlConf.UserName, sqlConf.Password); err != nil {
 		log.Panicf("Could not open db: error:%v", err)
 		return err
 	}
 	defer db.Close()
+	log.Println("Connected")
 
 	tx, err = db.Begin()
 	if err != nil {
@@ -32,16 +33,14 @@ func fetchCity(cityList *[]Publication) error {
 	}
 
 	// Initialize local variables and namespace
-	rows, err = tx.Query(use_database)
-	if err != nil {
+	if rows, err = tx.Query(use_database); err != nil {
 		log.Printf("Query failed: %s\n", use_database)
 		tx.Rollback()
 		return err
 	}
 	defer rows.Close()
 
-	rows, err = tx.Query(select_places)
-	if err != nil {
+	if rows, err = tx.Query(select_places); err != nil {
 		log.Printf("Query failed: %s\n", select_places)
 		tx.Rollback()
 		return err
@@ -59,7 +58,7 @@ func fetchCity(cityList *[]Publication) error {
 		}
 
 		// Collect additional rows
-		city := Publication{
+		pub := Publication{
 			Publisher: publisher,
 			Home:      home,
 			Imgref:    imgref,
@@ -70,15 +69,13 @@ func fetchCity(cityList *[]Publication) error {
 			Owner:     owner,
 			PubId:     pubId,
 		}
-		*cityList = append(*cityList, city)
+		pubs.cache[pubId] = pub
 	}
 
 	// Closeout transaction
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.Commit(); err != nil {
 		log.Printf("Warning: SQL transaction not properly commited: %v", err)
 		return err
 	}
-
 	return nil
 }
