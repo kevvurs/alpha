@@ -13,7 +13,7 @@ var sqlConf cloudsql
 
 func init() {
 	sqlConf.getConf()
-	pubCache.cache = make(map[int]string)
+	pubCache.cache = make(map[int]Publication)
 }
 
 // Query constants

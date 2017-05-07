@@ -33,5 +33,6 @@ func (pc *PubCache) Push(p *Publication) {
 func (pc *PubCache) Pull(id *int) *Publication {
 	pc.mux.Lock()
 	defer pc.mux.Unlock()
-	return &pc.cache[id]
+	p := pc.cache[*id]
+	return &p
 }
