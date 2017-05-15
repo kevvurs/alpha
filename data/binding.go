@@ -16,11 +16,30 @@ type Publication struct {
 	Ncred     int     `json:"ncred"`
 	Owner     string  `json:"owner"`
 	PubId     int     `json:"pubId"`
+	Exists    bool
 }
 
 type PubCache struct {
 	cache map[int]Publication
 	mux   sync.Mutex
+}
+
+type cloudsql struct {
+	Connection string `yaml:"instance"`
+	UserName   string `yaml:"user"`
+	Password   string `yaml:"paswd"`
+	Stmnt      struct {
+		Use_database        string `yaml:"use_database"`
+		Select_publications string `yaml:"select_publications"`
+		Insert_update       string `yaml:"insert_update"`
+		Insert_clobber      string `yaml:"insert_clobber"`
+		Delete_publication  string `yaml:"delete_publication"`
+	}
+}
+
+func (cl cloudsql) String() string {
+	return fmt.Sprintf("Google Cloud SQL Config:{conn:%s, user:%s, pass:%s}",
+		cl.Connection, cl.UserName, cl.Password)
 }
 
 func (p Publication) String() string {

@@ -1,10 +1,11 @@
 package service
 
 import (
+	"strconv"
 	"github.com/unrolled/render"
 	"net/http"
-
-	data "github.com/kevvurs/alpha/data"
+	"github.com/kevvurs/alpha/data"
+	"github.com/gorilla/mux"
 )
 
 // Ping status for Go server
@@ -14,13 +15,20 @@ func pingHandler(formatter *render.Render) http.HandlerFunc {
 	}
 }
 
-func locationListHandler(formatter *render.Render) http.HandlerFunc {
+func getData(formatter *render.Render) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		city, err := data.FetchCity()
-		if err == nil {
-			formatter.JSON(w, http.StatusOK, city)
+		vars := mux.Vars(req)
+		v := vars["pubid"]
+
+		if pubId, err := strconv.Atoi(v); err == nil {
+			cache := data.GetRepo();
+			if p := cache.Pull(&pubId); p.Exists {
+				formatter.JSON(w, http.StatusOK, p)
+			} else {
+				formatter.JSON(w, http.StatusNotFound, error("Cannot retrieve data for ID"))
+			}
 		} else {
-			formatter.JSON(w, http.StatusNotFound, err.Error())
+			formatter.JSON(w, http.StatusNotFound, error("Invalid path parameter"))
 		}
 	}
 }

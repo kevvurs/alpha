@@ -1,7 +1,6 @@
 package data
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -9,18 +8,7 @@ import (
 )
 
 // SQL Configuration
-var sqlConf cloudsql
-
-func init() {
-	sqlConf.getConf()
-	pubCache.cache = make(map[int]Publication)
-}
-
-// Query constants
-const (
-	use_database  = "USE MediaCred"
-	select_places = "SELECT * FROM Publications"
-)
+var sqlConf = initConf()
 
 func sysVar(k string) string {
 	v := os.Getenv(k)
@@ -30,18 +18,8 @@ func sysVar(k string) string {
 	return v
 }
 
-type cloudsql struct {
-	Connection string `yaml:"instance"`
-	UserName   string `yaml:"user"`
-	Password   string `yaml:"paswd"`
-}
-
-func (cl cloudsql) String() string {
-	return fmt.Sprintf("Google Cloud SQL Config:\n  conn:%s, user:%s, pass:%s",
-		cl.Connection, cl.UserName, cl.Password)
-}
-
-func (c *cloudsql) getConf() *cloudsql {
+func initConf() cloudsql {
+	c := new(cloudsql)
 	yamlFile, err := ioutil.ReadFile("./../config.yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
@@ -50,5 +28,5 @@ func (c *cloudsql) getConf() *cloudsql {
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 	}
-	return c
+	return *c
 }

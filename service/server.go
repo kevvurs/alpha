@@ -30,8 +30,8 @@ func NewServer() *negroni.Negroni {
 func initRoutes(mx *mux.Router, formatter *render.Render) {
 	log.Println("Routing API endpoints")
 	mx.HandleFunc("/ping", pingHandler(formatter)).Methods("GET")
-	mx.HandleFunc("/location", locationListHandler(formatter)).Methods("GET")
-	mx.HandleFunc("/location/{loc}", locationHandler(formatter)).Methods("GET")
+	mx.HandleFunc("/publication", getData(formatter)).Methods("GET")
+	mx.HandleFunc("/publication/{pubid}", getData(formatter)).Methods("GET")
 	// mx.HandleFunc("/matches", createMatchHandler(formatter, repo)).Methods("POST")
 	// mx.HandleFunc("/matches", getMatchListHandler(formatter, repo)).Methods("GET")
 	// mx.HandleFunc("/matches/{id}", getMatchDetailsHandler(formatter, repo)).Methods("GET")
